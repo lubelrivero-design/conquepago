@@ -1,0 +1,46 @@
+# Rehace las páginas del sitio con los datos del día.
+#
+# Los datos viven en el repo descuentos-ar-datos (público) y los actualiza la
+# rutina de la mañana. Esto los baja, corre generar.js y commitea lo que
+# cambió; GitHub Pages publica solo. El horario es aproximado: GitHub demora
+# los crons unas horas, y para estas páginas no importa.
+
+name: Páginas del día
+
+on:
+  schedule:
+    - cron: '41 11 * * *'   # ~08:41 de Argentina, después de la rutina
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  paginas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: lubelrivero-design/descuentos-ar-datos
+          path: datos
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: node generar.js
+
+      - name: Publicar
+        run: |
+          git config user.name  "paginas del dia"
+          git config user.email "paginas@users.noreply.github.com"
+          git add descuentos billeteras descuentos-hoy.html sitemap.xml robots.txt
+          if git diff --cached --quiet; then
+            echo "Nada cambió."
+          else
+            git commit -m "Páginas al $(TZ=America/Argentina/Buenos_Aires date +%Y-%m-%d)"
+            git push
+          fi

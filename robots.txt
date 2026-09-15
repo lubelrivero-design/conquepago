@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lubelrivero-design.github.io/conquepago/sitemap.xml
