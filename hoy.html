@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoy te conviene — ¿Con qué pago?</title>
+<meta name="description" content="Los mejores descuentos de hoy en súper, farmacia y nafta con billeteras y bancos de Argentina. Se actualiza todos los días.">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .imagen{width:100%;max-width:540px;display:block;margin:0 auto;border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+  .formatos{display:flex;gap:10px;justify-content:center;margin:16px 0 30px;flex-wrap:wrap}
+  .formatos a,.copiar{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--verde);color:#fff;text-decoration:none;font-weight:600;font-size:14.5px;border:0;cursor:pointer;font-family:inherit}
+  .formatos a.secundario{background:#fff;color:var(--verde);border:1px solid var(--linea)}
+  pre{white-space:pre-wrap;background:#fff;border:1px solid var(--linea);border-radius:14px;padding:16px 18px;font:15px/1.55 inherit;margin-bottom:10px}
+  @media (prefers-color-scheme:dark){pre,.formatos a.secundario{background:#1c1f25}}
+</style>
+</head>
+<body>
+<main>
+  <p class="volver"><a href="index.html">← ¿Con qué pago?</a></p>
+  <h1>Hoy te conviene</h1>
+  <p class="fecha" id="fecha">Los mejores descuentos del día en súper, farmacia y nafta. Se actualiza todas las mañanas.</p>
+
+  <img class="imagen" id="imagen" alt="Los mejores descuentos de hoy">
+  <div class="formatos">
+    <a id="bajar-feed" download="hoy-te-conviene.png">Bajar para Instagram / X</a>
+    <a id="bajar-historia" class="secundario" download="hoy-te-conviene-historia.png">Bajar para historias / WhatsApp</a>
+  </div>
+
+  <h2>Texto para pegar</h2>
+  <pre id="texto">Cargando…</pre>
+  <button class="copiar" id="copiar">Copiar el texto</button>
+
+  <p class="pie">Los datos salen de las páginas públicas de bancos, billeteras y comercios. Es una guía: antes de pagar, confirmá en la app de tu billetera.<br>
+  <a href="https://play.google.com/store/apps/details?id=ar.com.descuentos.conquepago">Bajate la app, es gratis</a></p>
+</main>
+<script>
+  /* Las imágenes las arma GitHub Actions cada mañana y quedan en el repo de
+     datos. El número de versión evita que el celular muestre la de ayer. */
+  const BASE = 'https://raw.githubusercontent.com/lubelrivero-design/descuentos-ar-datos/main/hoy/';
+  const v = '?v=' + new Date().toISOString().slice(0, 13);
+  document.getElementById('imagen').src = BASE + 'hoy.png' + v;
+  document.getElementById('bajar-feed').href = BASE + 'hoy.png' + v;
+  document.getElementById('bajar-historia').href = BASE + 'historia.png' + v;
+  fetch(BASE + 'texto.txt' + v).then(r => r.text()).then(t => { document.getElementById('texto').textContent = t.trim(); });
+  fetch(BASE + 'fecha.txt' + v).then(r => r.text()).then(f => {
+    const d = new Date(f.trim() + 'T12:00:00');
+    document.getElementById('fecha').textContent = 'Imagen del ' + d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }) + '. Se actualiza todas las mañanas.';
+  });
+  document.getElementById('copiar').onclick = async () => {
+    await navigator.clipboard.writeText(document.getElementById('texto').textContent);
+    document.getElementById('copiar').textContent = 'Copiado';
+  };
+</script>
+</body>
+</html>
